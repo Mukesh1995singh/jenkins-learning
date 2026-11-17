@@ -1,6 +1,13 @@
-
 pipeline {
     agent any
+
+    parameters {
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['Dev', 'Test', 'Prod'],
+            description: 'Select deployment environment'
+        )
+    }
 
     stages {
 
@@ -9,6 +16,12 @@ pipeline {
                 git branch: 'main',
                     credentialsId: 'github-git-credentials',
                     url: 'https://github.com/Mukesh1995singh/jenkins-learning.git'
+            }
+        }
+
+        stage('Show Environment') {
+            steps {
+                echo "Selected Environment: ${params.ENVIRONMENT}"
             }
         }
 
@@ -23,7 +36,7 @@ pipeline {
 
     post {
         success {
-            echo 'GitHub checkout completed successfully!'
+            echo 'Pipeline completed successfully!'
         }
 
         failure {
