@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -22,6 +23,16 @@ pipeline {
         stage('Show Environment') {
             steps {
                 echo "Selected Environment: ${params.ENVIRONMENT}"
+            }
+        }
+
+        stage('Show Jenkins Variables') {
+            steps {
+                echo "Job Name: ${env.JOB_NAME}"
+                echo "Build Number: ${env.BUILD_NUMBER}"
+                echo "Build ID: ${env.BUILD_ID}"
+                echo "Workspace: ${env.WORKSPACE}"
+                echo "Build URL: ${env.BUILD_URL}"
             }
         }
 
