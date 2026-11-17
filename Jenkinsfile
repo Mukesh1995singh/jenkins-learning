@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
 
@@ -46,6 +45,17 @@ pipeline {
                 ) {
                     bat 'exit /b 1'
                 }
+            }
+        }
+
+        stage('Create Artifact') {
+            steps {
+                echo 'Creating application artifact'
+
+                bat 'echo This is my application artifact > app-build.txt'
+
+                archiveArtifacts artifacts: 'app-build.txt',
+                                 fingerprint: true
             }
         }
 
