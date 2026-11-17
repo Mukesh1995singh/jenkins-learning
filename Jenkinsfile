@@ -63,6 +63,18 @@ pipeline {
                 bat 'type app.txt'
             }
         }
+
+        stage('Deploy') {
+            when {
+                expression {
+                    params.ENVIRONMENT == 'Prod'
+                }
+            }
+            steps {
+                echo "Deploying application to ${params.ENVIRONMENT}"
+                bat 'echo Production deployment completed'
+            }
+        }
     }
 
     post {
