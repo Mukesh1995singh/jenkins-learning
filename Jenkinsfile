@@ -1,4 +1,6 @@
 
+@Library('my-shared-library') _
+
 pipeline {
     agent any
 
@@ -14,9 +16,11 @@ pipeline {
 
         stage('GitHub Checkout') {
             steps {
-                git branch: 'main',
-                    credentialsId: 'github-git-credentials',
-                    url: 'https://github.com/Mukesh1995singh/jenkins-learning.git'
+                git(
+                    url: 'https://github.com/Mukesh1995singh/jenkins-learning.git',
+                    branch: 'main',
+                    credentialsId: 'github-git-credentials'
+                )
             }
         }
 
@@ -55,8 +59,10 @@ pipeline {
 
                 bat 'echo This is my application artifact > app-build.txt'
 
-                archiveArtifacts artifacts: 'app-build.txt',
-                                 fingerprint: true
+                archiveArtifacts(
+                    artifacts: 'app-build.txt',
+                    fingerprint: true
+                )
             }
         }
 
@@ -94,12 +100,19 @@ pipeline {
             }
         }
 
+        stage('Shared Library Demo') {
+            steps {
+                hello()
+            }
+        }
+
         stage('Production Approval') {
             when {
                 expression {
                     params.ENVIRONMENT == 'Prod'
                 }
             }
+
             steps {
                 input(
                     message: 'Approve Production deployment?',
@@ -114,6 +127,7 @@ pipeline {
                     params.ENVIRONMENT == 'Prod'
                 }
             }
+
             steps {
                 echo "Deploying application to ${params.ENVIRONMENT}"
                 bat 'echo Production deployment completed'
