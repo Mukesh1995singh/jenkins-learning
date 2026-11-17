@@ -39,7 +39,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building application'
-                bat 'echo Build completed'
+                bat 'exit /b 1'
             }
         }
 
