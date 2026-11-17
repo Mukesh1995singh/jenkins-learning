@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -63,6 +64,25 @@ pipeline {
             steps {
                 echo 'Testing application'
                 bat 'echo Test completed'
+            }
+        }
+
+        stage('Parallel Checks') {
+            parallel {
+
+                stage('Code Quality Check') {
+                    steps {
+                        echo 'Running Code Quality Check'
+                        bat 'echo Code Quality Check completed'
+                    }
+                }
+
+                stage('Security Scan') {
+                    steps {
+                        echo 'Running Security Scan'
+                        bat 'echo Security Scan completed'
+                    }
+                }
             }
         }
 
