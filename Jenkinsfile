@@ -36,6 +36,20 @@ pipeline {
             }
         }
 
+        stage('Build') {
+            steps {
+                echo 'Building application'
+                bat 'echo Build completed'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Testing application'
+                bat 'echo Test completed'
+            }
+        }
+
         stage('Verify Source Code') {
             steps {
                 bat 'echo Checking repository files'
