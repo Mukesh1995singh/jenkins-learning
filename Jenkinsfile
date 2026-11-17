@@ -39,7 +39,13 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building application'
-                bat 'exit /b 1'
+
+                catchError(
+                    buildResult: 'SUCCESS',
+                    stageResult: 'FAILURE'
+                ) {
+                    bat 'exit /b 1'
+                }
             }
         }
 
