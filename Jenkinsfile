@@ -12,51 +12,68 @@ pipeline {
         )
     }
 
+    environment {
+        APP_NAME = 'Jenkins Learning'
+        BUILD_TYPE = 'Demo'
+    }
+
     stages {
 
-        stage('GitHub Checkout') {
+        stage('Checkout') {
             steps {
-                git(
-                    url: 'https://github.com/Mukesh1995singh/jenkins-learning.git',
-                    branch: 'main',
-                    credentialsId: 'github-git-credentials'
-                )
-            }
-        }
-
-        stage('Show Environment') {
-            steps {
-                echo "Selected Environment: ${params.ENVIRONMENT}"
-            }
-        }
-
-        stage('Show Jenkins Variables') {
-            steps {
-                echo "Job Name: ${env.JOB_NAME}"
-                echo "Build Number: ${env.BUILD_NUMBER}"
-                echo "Build ID: ${env.BUILD_ID}"
-                echo "Workspace: ${env.WORKSPACE}"
-                echo "Build URL: ${env.BUILD_URL}"
+                echo 'Checking out source code from GitHub'
+                bat 'dir'
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Building application'
+                echo "Building ${APP_NAME}"
+                echo "Environment: ${params.ENVIRONMENT}"
+                bat 'echo Application build completed'
+            }
+        }
 
-                catchError(
-                    buildResult: 'SUCCESS',
-                    stageResult: 'FAILURE'
-                ) {
-                    bat 'exit /b 1'
+        stage('Test') {
+            steps {
+                echo 'Running application tests'
+                bat 'echo Tests completed successfully'
+            }
+        }
+
+        stage('Environment Variables') {
+            steps {
+                echo "Job Name: ${env.JOB_NAME}"
+                echo "Build Number: ${env.BUILD_NUMBER}"
+                echo "Workspace: ${env.WORKSPACE}"
+                echo "Build Type: ${env.BUILD_TYPE}"
+            }
+        }
+
+        stage('Failure Handling Demo') {
+            steps {
+                echo 'Failure handling lesson completed'
+            }
+        }
+
+        stage('Conditional Deployment') {
+            when {
+                expression {
+                    params.ENVIRONMENT == 'Prod'
                 }
+            }
+            steps {
+                input(
+                    message: 'Approve Production deployment?',
+                    ok: 'Approve'
+                )
+                echo 'Production deployment approved'
             }
         }
 
         stage('Create Artifact') {
             steps {
                 echo 'Creating application artifact'
-
                 bat 'echo This is my application artifact > app-build.txt'
 
                 archiveArtifacts(
@@ -66,16 +83,8 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                echo 'Testing application'
-                bat 'echo Test completed'
-            }
-        }
-
         stage('Parallel Checks') {
             parallel {
-
                 stage('Code Quality Check') {
                     steps {
                         echo 'Running Code Quality Check'
@@ -92,45 +101,30 @@ pipeline {
             }
         }
 
-        stage('Verify Source Code') {
-            steps {
-                bat 'echo Checking repository files'
-                bat 'dir'
-                bat 'type app.txt'
-            }
-        }
-
         stage('Shared Library Demo') {
             steps {
                 hello()
             }
         }
 
-        stage('Production Approval') {
-            when {
-                expression {
-                    params.ENVIRONMENT == 'Prod'
-                }
-            }
-
+        // Lesson 20: Credentials Binding
+        stage('Credentials Binding Demo') {
             steps {
-                input(
-                    message: 'Approve Production deployment?',
-                    ok: 'Approve'
-                )
-            }
-        }
-
-        stage('Deploy') {
-            when {
-                expression {
-                    params.ENVIRONMENT == 'Prod'
+                withCredentials([
+                    string(
+                        credentialsId: 'github-pat',
+                        variable: 'GITHUB_TOKEN'
+                    )
+                ]) {
+                    bat '''
+                        if defined GITHUB_TOKEN (
+                            echo GitHub token loaded successfully
+                        ) else (
+                            echo GitHub token not found
+                            exit /b 1
+                        )
+                    '''
                 }
-            }
-
-            steps {
-                echo "Deploying application to ${params.ENVIRONMENT}"
-                bat 'echo Production deployment completed'
             }
         }
     }
@@ -141,15 +135,11 @@ pipeline {
         }
 
         success {
-            echo 'Pipeline completed successfully!'
+            echo 'Pipeline completed successfully'
         }
 
         failure {
-            echo 'Pipeline failed! Check console output.'
-        }
-
-        unstable {
-            echo 'Pipeline is unstable!'
+            echo 'Pipeline failed. Check the console output.'
         }
     }
 }
