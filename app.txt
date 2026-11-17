@@ -1,3 +1,4 @@
 Welcome to Jenkins.
 Learning Jenkins CI/CD with GitHub.
 My first Jenkins pipeline project.
+Testing Jenkins Poll SCM trigger.
