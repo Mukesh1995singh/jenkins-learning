@@ -60,12 +60,20 @@ pipeline {
     }
 
     post {
+        always {
+            echo 'Pipeline execution completed'
+        }
+
         success {
             echo 'Pipeline completed successfully!'
         }
 
         failure {
-            echo 'Pipeline failed. Check the console output.'
+            echo 'Pipeline failed! Check console output.'
+        }
+
+        unstable {
+            echo 'Pipeline is unstable!'
         }
     }
 }
