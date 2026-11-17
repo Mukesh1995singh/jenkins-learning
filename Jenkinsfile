@@ -22,6 +22,13 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Checking out source code from GitHub'
+
+                git(
+                    url: 'https://github.com/Mukesh1995singh/jenkins-learning.git',
+                    branch: 'main',
+                    credentialsId: 'github-git-credentials'
+                )
+
                 bat 'dir'
             }
         }
@@ -67,6 +74,7 @@ pipeline {
                     message: 'Approve Production deployment?',
                     ok: 'Approve'
                 )
+
                 echo 'Production deployment approved'
             }
         }
@@ -74,6 +82,7 @@ pipeline {
         stage('Create Artifact') {
             steps {
                 echo 'Creating application artifact'
+
                 bat 'echo This is my application artifact > app-build.txt'
 
                 archiveArtifacts(
@@ -111,12 +120,20 @@ pipeline {
         stage('Credentials Binding Demo') {
             steps {
                 withCredentials([
-                    string(
-                        credentialsId: 'github-pat',
-                        variable: 'GITHUB_TOKEN'
+                    usernamePassword(
+                        credentialsId: 'github-git-credentials',
+                        usernameVariable: 'GITHUB_USERNAME',
+                        passwordVariable: 'GITHUB_TOKEN'
                     )
                 ]) {
                     bat '''
+                        if defined GITHUB_USERNAME (
+                            echo GitHub username loaded successfully
+                        ) else (
+                            echo GitHub username not found
+                            exit /b 1
+                        )
+
                         if defined GITHUB_TOKEN (
                             echo GitHub token loaded successfully
                         ) else (
